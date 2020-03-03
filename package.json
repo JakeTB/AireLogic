@@ -1,0 +1,20 @@
+{
+  "name": "AireLogix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JakeTB/AireLogic.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JakeTB/AireLogic/issues"
+  },
+  "homepage": "https://github.com/JakeTB/AireLogic#readme"
+}
