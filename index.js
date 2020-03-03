@@ -1,5 +1,7 @@
 const inquirer = require("inquirer")
-const mb = require("musicbrainz")
+const axios = require("axios")
+
+
 inquirer
 .prompt([
     {type:"input",
@@ -8,5 +10,17 @@ inquirer
 }
 ]).then(answers => {
     const {artist} = answers
-    console.log(artist)
+return axios.get(`http://musicbrainz.org/ws/2/artist/?query=${artist}&fmt=json`).then((response)=>{
+    const {artists} = response.data
+
+const correctArtist = artists.filter(artistInfo=>{
+    if(artistInfo.name.toLowerCase()===artist.toLowerCase()) {
+        return artistInfo
+    }
+    
 })
+console.log(correctArtist)
+})
+    })
+  
+ 
