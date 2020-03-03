@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"node index.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,11 @@
   "bugs": {
     "url": "https://github.com/JakeTB/AireLogic/issues"
   },
-  "homepage": "https://github.com/JakeTB/AireLogic#readme"
+  "homepage": "https://github.com/JakeTB/AireLogic#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "inquirer": "^7.0.5",
+    "musicbrainz": "^0.2.6",
+    "musicbrainz-api": "^0.5.2"
+  }
 }
