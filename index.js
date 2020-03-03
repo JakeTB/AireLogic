@@ -1,6 +1,6 @@
 const inquirer = require("inquirer")
 const axios = require("axios")
-
+const mb = require('musicbrainz');
 
 inquirer
 .prompt([
@@ -19,8 +19,46 @@ const correctArtist = artists.filter(artistInfo=>{
     }
     
 })
-console.log(correctArtist)
+
+const {id} = correctArtist[0]
+albumLookup(id)
 })
     })
+const albumLookup = (id) =>{
+console.log("ID",id)
+return axios.get(`http://musicbrainz.org/ws/2/artist/${id}?inc=release-groups&fmt=json`).then((response)=>{
+    const {"release-groups":releasegroups} = response.data
+    const averageOptions = ["Songs from all the albums"]
+    const albumId = {}
+releasegroups.forEach(album=>{
+    const{title,id} = album
+    averageOptions.push(title)
+    albumId[`${title}`] = id
+
+})
+
+
+    return [averageOptions,albumId]
+
+}).then((response) =>{
+ const [choices, albums] =response
+    inquirer
+    .prompt([
+        {type:"list",
+        message:"Which average would you like to see?",
+        choices,
+        name:"selectedAverage"
+    }
+
+    ]).then((response)=>{
+        const{selectedAverage} = response
   
+        if(selectedAverage==="Songs from all the albums"){
+
+        }
+        
+    })}
+    
+)
+}
  
