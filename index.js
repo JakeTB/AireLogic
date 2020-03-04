@@ -2,6 +2,56 @@ const inquirer = require("inquirer")
 const axios = require("axios")
 const mb = require('musicbrainz');
 
+const createLyricsLookupObj = (albumInfo) => {
+
+        const {"track-count":trackcount, tracks} = albumInfo[0]
+        const {"artist-credit":artistcredit} = tracks[0]
+        const {artist:{name}} = artistcredit[0]
+        const trackNames = [] 
+        tracks.forEach(trackInfo=>{
+            trackNames.push(trackInfo.title)
+        })
+        changedTracks = trackNames.map(track=>{
+            
+            return track.split(' ').join('+')
+        })
+        
+        const AlbumLookupObj = {
+            trackcount,
+            name,
+            changedTracks
+        }
+getAlbumAverage(AlbumLookupObj)
+        
+
+
+    
+}
+const getAlbumAverage = (album) => {
+    const {trackcount, name, changedTracks} = album
+    
+    changedTracks.forEach(track=>{
+        lyricsPerSong = []
+        console.log(`https://api.lyrics.ovh/v1/${name}/${track}`)
+        return axios.get(`https://api.lyrics.ovh/v1/${name}/${track}`).then((response)=>{
+            lyricsPerSong.push(response.data.lyrics.length)
+       
+             if(lyricsPerSong.length === trackcount) {
+                 return lyricsPerSong
+             }
+        }).catch((err)=>{
+            console.log("ERROR",err)
+        }).then((response)=>{
+            if(response !== undefined) {
+                const averageLyrics = response.reduce((a, b) => a + b, 0) / trackcount
+                console.log(`The average amount of lyrics per song is ${averageLyrics}`)
+            }
+            
+        })
+        
+    } )
+    
+}
 inquirer
 .prompt([
     {type:"input",
@@ -25,7 +75,6 @@ albumLookup(id)
 })
     })
 const albumLookup = (id) =>{
-console.log("ID",id)
 return axios.get(`http://musicbrainz.org/ws/2/artist/${id}?inc=release-groups&fmt=json`).then((response)=>{
     const {"release-groups":releasegroups} = response.data
     const averageOptions = ["Songs from all the albums"]
@@ -36,10 +85,7 @@ releasegroups.forEach(album=>{
     albumId[`${title}`] = id
 
 })
-
-
     return [averageOptions,albumId]
-
 }).then((response) =>{
  const [choices, albums] =response
     inquirer
@@ -49,16 +95,24 @@ releasegroups.forEach(album=>{
         choices,
         name:"selectedAverage"
     }
-
     ]).then((response)=>{
         const{selectedAverage} = response
-  
         if(selectedAverage==="Songs from all the albums"){
-
         }
-        
+        return axios.get(`http://musicbrainz.org/ws/2/release-group/${albums[selectedAverage]}?inc=releases&fmt=json`).then((response)=>{
+            const {id} = response.data.releases[0]
+            songLookup(id)
+            console.log(id)
+        })
     })}
     
 )
 }
- 
+const songLookup = (id) => {
+    return axios.get(`http://musicbrainz.org/ws/2/release/${id}?inc=artist-credits+recordings&fmt=json`).then((response)=>{
+        const {media} = response.data
+
+        createLyricsLookupObj(media)
+    })
+
+}
