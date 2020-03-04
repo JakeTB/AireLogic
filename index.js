@@ -1,69 +1,10 @@
 const inquirer = require("inquirer")
 const axios = require("axios")
-const mb = require('musicbrainz');
+const {createLyricsLookupObj, songLookup,calculateAverageForAllAlbums} =require("./utils")
 
 
 
-const createLyricsLookupObj = (albumInfo) => {
 
-        const {"track-count":trackcount, tracks} = albumInfo[0]
-        const {"artist-credit":artistcredit} = tracks[0]
-        const {artist:{name}} = artistcredit[0]
-        const trackNames = [] 
-        tracks.forEach(trackInfo=>{
-            trackNames.push(trackInfo.title)
-        })
-        changedTracks = trackNames.map(track=>{
-
-            
-            return track.replace(/[^a-zA-Z ]+/ig, '')
-        })
-        
-        const AlbumLookupObj = {
-            trackcount,
-            name,
-            changedTracks
-        }
-getAlbumAverage(AlbumLookupObj)
-        
-
-
-    
-}
-const getAlbumAverage = (album) => {
-    const {trackcount, name, changedTracks} = album
-    
-    changedTracks.forEach(track=>{
-        lyricsPerSong = []
-        console.log(`https://api.lyrics.ovh/v1/${name}/${track}`)
-        return axios.get(`https://api.lyrics.ovh/v1/${name}/${track}`).then((response)=>{
-            console.log("RESPONSE STATUS-------->", response.status )
-            
-         
-            lyricsPerSong.push(response.data.lyrics.length)
-            
-       
-             if(lyricsPerSong.length === trackcount) {
-                 return lyricsPerSong
-             }
-        }).catch((err,response)=>{
-            console.log(`No lyrics found for ${track}`)
-            lyricsPerSong.push(0)
-            if(lyricsPerSong.length === trackcount) {
-                return lyricsPerSong
-            }
-        }).then((response)=>{
-            if(response !== undefined) {
-                console.log("PRINT ME")
-                const averageLyrics = response.reduce((a, b) => a + b, 0) / trackcount
-                console.log(`The average amount of lyrics per song is ${averageLyrics}`)
-            }
-            
-        })
-        
-    } )
-    
-}
 inquirer
 .prompt([
     {type:"input",
@@ -110,21 +51,17 @@ releasegroups.forEach(album=>{
     ]).then((response)=>{
         const{selectedAverage} = response
         if(selectedAverage==="Songs from all the albums"){
+            calculateAverageForAllAlbums(albums)
+        }else {
+            return axios.get(`http://musicbrainz.org/ws/2/release-group/${albums[selectedAverage]}?inc=releases&fmt=json`).then((response)=>{
+                const {id} = response.data.releases[0]
+                songLookup(id)
+                console.log(id)
+            })  
         }
-        return axios.get(`http://musicbrainz.org/ws/2/release-group/${albums[selectedAverage]}?inc=releases&fmt=json`).then((response)=>{
-            const {id} = response.data.releases[0]
-            songLookup(id)
-            console.log(id)
-        })
+       
     })}
     
 )
 }
-const songLookup = (id) => {
-    return axios.get(`http://musicbrainz.org/ws/2/release/${id}?inc=artist-credits+recordings&fmt=json`).then((response)=>{
-        const {media} = response.data
 
-        createLyricsLookupObj(media)
-    })
-
-}

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node index.js"
+    "test": "mocha spec/utils",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,9 @@
   "homepage": "https://github.com/JakeTB/AireLogic#readme",
   "dependencies": {
     "axios": "^0.19.2",
+    "chai": "^4.2.0",
     "inquirer": "^7.0.5",
+    "mocha": "^7.1.0",
     "musicbrainz": "^0.2.6",
     "musicbrainz-api": "^0.5.2"
   }
