@@ -22,7 +22,7 @@
     "axios": "^0.19.2",
     "chai": "^4.2.0",
     "inquirer": "^7.0.5",
-    "mocha": "^7.1.0",
+    "mocha": "^10.2.0",
     "musicbrainz": "^0.2.6",
     "musicbrainz-api": "^0.5.2"
   }
